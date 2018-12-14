@@ -1,6 +1,7 @@
 package de.rawsoft.snake;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -17,7 +18,7 @@ public class Snake {
 	private Direction direction = Direction.RIGHT;
 	private List<BoundedVector2i> body = new ArrayList<>();
 	private BoundedVector2i food = new BoundedVector2i(Main.WIDTH - Main.TILE_SIZE, Main.HEIGHT - Main.TILE_SIZE);
-	private static final int ARC_SIZE = 10;
+	private static final int ARC_SIZE = 20;
 
 	public Snake(GraphicsContext g) {
 		this.g = g;
@@ -72,9 +73,8 @@ public class Snake {
 			g.setFill(gradient);
 			g.fillRoundRect(p.getX(), p.getY(), Main.TILE_SIZE, Main.TILE_SIZE, ARC_SIZE, ARC_SIZE);
 		}
-		g.setFill(Color.RED);
-		g.fillRoundRect(food.getX(), food.getY(), Main.TILE_SIZE, Main.TILE_SIZE, ARC_SIZE, ARC_SIZE);
-		g.setFill(Color.BLACK);
+
+		g.drawImage(new Image("/resources/apple.jpg"), food.getX(), food.getY(), Main.TILE_SIZE, Main.TILE_SIZE);
 
 		count %= body.size() > 30 ? body.size() : 30;
 	}

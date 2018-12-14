@@ -38,6 +38,7 @@ public class Main extends Application {
 
 		Snake snake = new Snake(canvas.getGraphicsContext2D());
 		Timeline timer = new Timeline(new KeyFrame(Duration.millis(200), "Timer", (e) -> {
+			snake.clearLast();
 			snake.update();
 			pressed = false;
 		}));

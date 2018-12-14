@@ -42,6 +42,10 @@ public class BoundedVector2i extends Vector2i {
 		this.y = y;
 	}
 
+	public Vector2i toUnboundVector() {
+		return new Vector2i(this.x, this.y);
+	}
+
 	@Override
 	public BoundedVector2i clone() {
 		return new BoundedVector2i(getX(), getY(), boundX, boundY);

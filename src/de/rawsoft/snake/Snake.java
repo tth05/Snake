@@ -35,23 +35,28 @@ public class Snake {
 	int count = 0;
 	int draw = 0;
 
+	public void clearLast() {
+		BoundedVector2i vec = body.get(body.size() - 1);
+		g.clearRect(vec.getX(), vec.getY(), Main.TILE_SIZE, Main.TILE_SIZE);
+	}
+
 	public void draw() {
 		draw++;
-		g.clearRect(0, 0, Main.WIDTH, Main.HEIGHT);
 
-		if (draw % 25 == 0) {
+		if (draw % 30 == 0) {
 			count += body.size();
 			draw = 0;
 		}
 
-		BoundedVector2i previous;
+		Vector2i previous;
 		for(int i = body.size() - 1; i >= 0; i--) {
 			BoundedVector2i p = body.get(i);
 			if(i == body.size() - 1) {
-				previous = p.clone();
+				previous = p.clone().toUnboundVector();
 				previous.add(-(body.get(i - 1).getX() - previous.getX()), -(body.get(i - 1).getY() - previous.getY()));
+				g.clearRect(previous.getX(), previous.getY(), Main.TILE_SIZE, Main.TILE_SIZE);
 			} else {
-				previous = body.get(i + 1);
+				previous = body.get(i + 1).toUnboundVector();
 			}
 
 			double startX = previous.getX() < p.getX() ? 0 : previous.getX() > p.getX() ? 1 : 0.5;
@@ -62,9 +67,9 @@ public class Snake {
 			previousRed = i == body.size() - 1 ? 255 : red;
 			previousGreen = i == body.size() - 1 ? 255 : green;
 			previousBlue = i == body.size() - 1 ? 255 : blue;
-			red = (int) (Math.sin(.3 * (count + i) + 0) * 127 + 128);
-			green = (int) (Math.sin(.3 * (count + i) + 2 * Math.PI / 3) * 127 + 128);
-			blue = (int) (Math.sin(.3 * (count + i) + 4 * Math.PI / 3) * 127 + 128);
+			red = (int) (Math.sin(.1 * (count + i) + 0) * 127 + 128);
+			green = (int) (Math.sin(.1 * (count + i) + 2 * Math.PI / 3) * 127 + 128);
+			blue = (int) (Math.sin(.1 * (count + i) + 4 * Math.PI / 3) * 127 + 128);
 			Stop[] stops = {
 					new Stop(0, Color.rgb(previousRed, previousGreen, previousBlue)),
 					new Stop(1, Color.rgb(red, green, blue))
@@ -72,6 +77,16 @@ public class Snake {
 			LinearGradient gradient = new LinearGradient(startX, startY, endX, endY, true, CycleMethod.NO_CYCLE, stops);
 			g.setFill(gradient);
 			g.fillRoundRect(p.getX(), p.getY(), Main.TILE_SIZE, Main.TILE_SIZE, ARC_SIZE, ARC_SIZE);
+
+			//Draw highscore
+			g.save();
+			g.setGlobalAlpha(.1);
+			g.setFill(Color.GRAY);
+			g.fillRoundRect(5,5,100, 30, 10, 10);
+			g.setGlobalAlpha(1);
+			g.setFill(Color.BLACK);
+			g.fillText("Highscore: " + Main.highscore, 15, 25);
+			g.restore();
 		}
 
 		g.drawImage(new Image("/resources/apple.jpg"), food.getX(), food.getY(), Main.TILE_SIZE, Main.TILE_SIZE);
@@ -97,6 +112,8 @@ public class Snake {
 	}
 
 	private void reset() {
+		g.clearRect(0,0,Main.WIDTH, Main.HEIGHT);
+
 		if (body.size() > Main.highscore)
 			Main.highscore = body.size();
 		body.clear();
@@ -107,8 +124,6 @@ public class Snake {
 	}
 
 	private void updateFood() {
-		g.clearRect(food.getX(), food.getY(), Main.TILE_SIZE, Main.TILE_SIZE);
-
 		List<Pair<Integer, Integer>> list = new ArrayList<>();
 		for (int x = 0; x < Main.WIDTH; x += Main.TILE_SIZE) {
 			for (int y = 0; y < Main.HEIGHT; y += Main.TILE_SIZE) {

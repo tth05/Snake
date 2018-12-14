@@ -43,17 +43,20 @@ public class Snake {
 			draw = 0;
 		}
 
-		BoundedVector2i next;
 		BoundedVector2i previous;
 		for(int i = body.size() - 1; i >= 0; i--) {
 			BoundedVector2i p = body.get(i);
 			if(i == body.size() - 1) {
 				previous = p.clone();
-				previous.add(-direction.getX(), -direction.getY());
-			} else if(i == 0) {
-				next = p.clone();
-				next.add(direction.getX(), direction.getY());
+				previous.add(-(body.get(i - 1).getX() - previous.getX()), -(body.get(i - 1).getY() - previous.getY()));
+			} else {
+				previous = body.get(i + 1);
 			}
+
+			double startX = previous.getX() < p.getX() ? 0 : previous.getX() > p.getX() ? 1 : 0.5;
+			double startY = previous.getY() < p.getY() ? 0 : previous.getY() > p.getY() ? 1 : 0.5;
+			double endX = startX == 1 ? 0 : startX == 0 ? 1 : 0.5;
+			double endY = startY == 1 ? 0 : startY == 0 ? 1 : 0.5;
 
 			previousRed = i == body.size() - 1 ? 255 : red;
 			previousGreen = i == body.size() - 1 ? 255 : green;
@@ -62,10 +65,10 @@ public class Snake {
 			green = (int) (Math.sin(.3 * (count + i) + 2 * Math.PI / 3) * 127 + 128);
 			blue = (int) (Math.sin(.3 * (count + i) + 4 * Math.PI / 3) * 127 + 128);
 			Stop[] stops = {
-					new Stop(1, Color.rgb(previousRed, previousGreen, previousBlue)),
-					new Stop(0, Color.rgb(red, green, blue))
+					new Stop(0, Color.rgb(previousRed, previousGreen, previousBlue)),
+					new Stop(1, Color.rgb(red, green, blue))
 			};
-			LinearGradient gradient = new LinearGradient(0, .5, 1, 0.5, true, CycleMethod.NO_CYCLE, stops);
+			LinearGradient gradient = new LinearGradient(startX, startY, endX, endY, true, CycleMethod.NO_CYCLE, stops);
 			g.setFill(gradient);
 			g.fillRoundRect(p.getX(), p.getY(), Main.TILE_SIZE, Main.TILE_SIZE, ARC_SIZE, ARC_SIZE);
 		}
